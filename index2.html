@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Vivek Calculator X</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body{
+min-height:100vh;background:#020617;color:#fff;
+display:flex;justify-content:center;align-items:center;padding:15px;
+}
+.app{
+width:460px;max-width:100%;padding:18px;border-radius:30px;
+background:rgba(15,23,42,.94);border:1px solid #ffffff18;
+box-shadow:0 25px 80px #0008;backdrop-filter:blur(20px)
+}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.brand{display:flex;gap:10px;align-items:center}
+.logo{
+width:44px;height:44px;border-radius:14px;
+display:grid;place-items:center;font-size:23px;
+background:linear-gradient(135deg,#2563eb,#9333ea)
+}
+h1{font-size:18px}.sub{font-size:10px;color:#64748b;margin-top:3px}
+.top button,.small{
+border:0;border-radius:11px;background:#1e293b;color:white;
+cursor:pointer
+}
+.top button{width:40px;height:40px;font-size:17px}
+
+/* display */
+.display{
+background:#020617;border:1px solid #ffffff0b;border-radius:22px;
+padding:17px;margin-bottom:10px;min-height:125px;
+display:flex;flex-direction:column;justify-content:end
+}
+.mode{
+font-size:11px;color:#38bdf8;margin-bottom:7px
+}
+.expr{font-size:14px;color:#64748b;min-height:21px;text-align:right}
+.answer{
+font-size:38px;font-weight:bold;text-align:right;
+overflow-x:auto;white-space:nowrap
+}
+
+/* modes */
+.modebar{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:10px}
+.modebar button,.tabs button{
+height:37px;border:0;border-radius:10px;
+background:#1e293b;color:#cbd5e1;cursor:pointer;font-weight:bold
+}
+.modebar button.active{background:#0369a1;color:white}
+
+/* scientific */
+.panel{display:none}
+.panel.active{display:block}
+.scientific{
+display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-bottom:10px
+}
+.scientific button{
+height:42px;border:0;border-radius:11px;
+background:#172554;color:#bfdbfe;cursor:pointer;font-weight:bold
+}
+
+/* main keys */
+.keys{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.key{
+height:57px;border:0;border-radius:15px;background:#1e293b;
+color:white;font-size:18px;font-weight:bold;cursor:pointer
+}
+.key:hover{filter:brightness(1.2);transform:translateY(-1px)}
+.op{background:#075985}.eq{background:#16a34a}.danger{background:#dc2626}
+.zero{grid-column:span 2}
+
+/* history */
+.history{
+margin-top:12px;background:#020617;border-radius:18px;padding:11px
+}
+.histhead{display:flex;justify-content:space-between;color:#94a3b8;font-size:12px}
+.histhead button{background:none;border:0;color:#f87171;cursor:pointer}
+.histlist{max-height:110px;overflow:auto;margin-top:7px}
+.histitem{
+padding:7px 3px;border-bottom:1px solid #ffffff0b;
+font-size:13px;color:#cbd5e1;cursor:pointer
+}
+
+/* extra panels */
+.card{
+background:#020617;border-radius:17px;padding:14px;margin-bottom:10px
+}
+.card h3{font-size:14px;color:#38bdf8;margin-bottom:10px}
+.row{display:flex;gap:7px;margin-bottom:8px}
+input,select{
+width:100%;padding:11px;border:0;border-radius:10px;
+background:#1e293b;color:white;outline:none
+}
+.action{
+border:0;border-radius:10px;padding:10px 13px;
+background:#2563eb;color:white;cursor:pointer
+}
+.resultbox{
+padding:10px;background:#111827;border-radius:10px;
+margin-top:8px;color:#e2e8f0
+}
+.constants{
+display:grid;grid-template-columns:1fr 1fr;gap:7px
+}
+.constant{
+padding:10px;background:#111827;border-radius:10px;
+font-size:12px;cursor:pointer
+}
+.constant b{color:#38bdf8}
+
+.footer{text-align:center;color:#475569;font-size:10px;margin-top:10px}
+
+@media(max-width:450px){
+.app{padding:13px;border-radius:25px}
+.key{height:53px;font-size:16px}
+.answer{font-size:31px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="top">
+<div class="brand">
+<div class="logo">⚡</div>
+<div>
+<h1>VIVEK CALCULATOR X</h1>
+<div class="sub">ADVANCED • SCIENTIFIC • JEE</div>
+</div>
+</div>
+
+<div>
+<button onclick="toggleTheme()" id="theme">☾</button>
+</div>
+</div>
+
+<!-- DISPLAY -->
+<div class="display">
+<div class="mode" id="angleMode">DEG</div>
+<div class="expr" id="expr"></div>
+<div class="answer" id="answer">0</div>
+</div>
+
+<!-- MAIN TABS -->
+<div class="modebar">
+<button class="active" onclick="showPanel('calc',this)">CALC</button>
+<button onclick="showPanel('scientific',this)">SCI</button>
+<button onclick="showPanel('stats',this)">STATS</button>
+<button onclick="showPanel('tools',this)">TOOLS</button>
+</div>
+
+<!-- SCIENTIFIC PANEL -->
+<div id="scientific" class="panel">
+
+<div class="scientific">
+<button onclick="func('sin')">sin</button>
+<button onclick="func('cos')">cos</button>
+<button onclick="func('tan')">tan</button>
+<button onclick="func('asin')">sin⁻¹</button>
+<button onclick="func('acos')">cos⁻¹</button>
+
+<button onclick="func('atan')">tan⁻¹</button>
+<button onclick="func('sqrt')">√</button>
+<button onclick="func('square')">x²</button>
+<button onclick="func('cube')">x³</button>
+<button onclick="func('log')">log</button>
+
+<button onclick="func('ln')">ln</button>
+<button onclick="func('exp')">eˣ</button>
+<button onclick="func('ten')">10ˣ</button>
+<button onclick="func('fact')">x!</button>
+<button onclick="func('inverse')">1/x</button>
+
+<button onclick="func('abs')">|x|</button>
+<button onclick="insert('Math.PI')">π</button>
+<button onclick="insert('Math.E')">e</button>
+<button onclick="insert('**')">xʸ</button>
+<button onclick="percent()">%</button>
+</div>
+
+<div class="row">
+<button class="action" onclick="toggleAngle()">DEG / RAD</button>
+<button class="action" onclick="memoryClear()">MC</button>
+<button class="action" onclick="memoryRecall()">MR</button>
+<button class="action" onclick="memoryAdd()">M+</button>
+<button class="action" onclick="memoryStore()">MS</button>
+</div>
+
+</div>
+
+<!-- CALCULATOR -->
+<div id="calc" class="panel active">
+
+<div class="keys">
+
+<button class="key danger" onclick="clearAll()">AC</button>
+<button class="key" onclick="backspace()">⌫</button>
+<button class="key" onclick="insert('(')">(</button>
+<button class="key" onclick="insert(')')">)</button>
+<button class="key op" onclick="insert('/')">÷</button>
+
+<button class="key" onclick="insert('7')">7</button>
+<button class="key" onclick="insert('8')">8</button>
+<button class="key" onclick="insert('9')">9</button>
+<button class="key op" onclick="insert('*')">×</button>
+<button class="key" onclick="percent()">%</button>
+
+<button class="key" onclick="insert('4')">4</button>
+<button class="key" onclick="insert('5')">5</button>
+<button class="key" onclick="insert('6')">6</button>
+<button class="key op" onclick="insert('-')">−</button>
+<button class="key" onclick="insert('.')">.</button>
+
+<button class="key" onclick="insert('1')">1</button>
+<button class="key" onclick="insert('2')">2</button>
+<button class="key" onclick="insert('3')">3</button>
+<button class="key op" onclick="insert('+')">+</button>
+<button class="key eq" onclick="calculate()">=</button>
+
+<button class="key zero" onclick="insert('0')">0</button>
+<button class="key" onclick="insert('00')">00</button>
+<button class="key" onclick="insert('Math.PI')">π</button>
+
+</div>
+</div>
+
+<!-- STATISTICS -->
+<div id="stats" class="panel">
+
+<div class="card">
+<h3>📊 Statistics Calculator</h3>
+
+<input id="numbers"
+placeholder="Example: 10, 20, 30, 40, 50">
+
+<div class="row" style="margin-top:8px">
+<button class="action" onclick="statistics()">Calculate</button>
+</div>
+
+<div class="resultbox" id="statsResult">
+Enter numbers separated by commas.
+</div>
+</div>
+
+</div>
+
+<!-- TOOLS -->
+<div id="tools" class="panel">
+
+<div class="card">
+
+<h3>🔄 Unit Converter</h3>
+
+<div class="row">
+<select id="unitType" onchange="updateUnits()">
+<option value="length">Length</option>
+<option value="temperature">Temperature</option>
+<option value="speed">Speed</option>
+<option value="mass">Mass</option>
+</select>
+</div>
+
+<div class="row">
+<input id="unitValue" type="number" placeholder="Value">
+</div>
+
+<div class="row">
+<select id="from"></select>
+<select id="to"></select>
+</div>
+
+<button class="action" onclick="convert()">Convert</button>
+
+<div class="resultbox" id="convertResult">Result will appear here.</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>🚀 JEE Quick Constants</h3>
+
+<div class="constants">
+
+<div class="constant" onclick="copyText('π')">
+<b>π</b> = 3.14159265
+</div>
+
+<div class="constant" onclick="copyText('√2')">
+<b>√2</b> = 1.41421356
+</div>
+
+<div class="constant" onclick="copyText('√3')">
+<b>√3</b> = 1.73205080
+</div>
+
+<div class="constant" onclick="copyText('√5')">
+<b>√5</b> = 2.23606797
+</div>
+
+<div class="constant" onclick="copyText('g')">
+<b>g</b> ≈ 9.8 m/s²
+</div>
+
+<div class="constant" onclick="copyText('c')">
+<b>c</b> = 3×10⁸ m/s
+
+<!-- ================= AGE CALCULATOR ================= -->
+
+<div class="age-calculator">
+
+    <div class="age-title">
+        🎂 Age Calculator
+    </div>
+
+    <p class="age-subtitle">
+        Calculate your exact age
+    </p>
+
+    <label>Date of Birth</label>
+
+    <input
+        type="date"
+        id="dob"
+        class="age-input"
+    >
+
+    <button
+        class="age-btn"
+        onclick="calculateAge()">
+        Calculate Age
+    </button>
+
+    <div
+        id="ageResult"
+        class="age-result">
+
+        Enter your date of birth above.
+
+    </div>
+
+</div>
+
+
+<style>
+
+.age-calculator{
+    background:#020617;
+    border:1px solid #ffffff12;
+    border-radius:20px;
+    padding:18px;
+    margin-top:15px;
+    color:white;
+}
+
+.age-title{
+    font-size:20px;
+    font-weight:bold;
+    color:#38bdf8;
+    margin-bottom:4px;
+}
+
+.age-subtitle{
+    color:#64748b;
+    font-size:12px;
+    margin-bottom:16px;
+}
+
+.age-calculator label{
+    display:block;
+    color:#94a3b8;
+    font-size:13px;
+    margin-bottom:7px;
+}
+
+.age-input{
+    width:100%;
+    padding:13px;
+    border:none;
+    outline:none;
+    border-radius:12px;
+    background:#1e293b;
+    color:white;
+    font-size:15px;
+}
+
+.age-btn{
+    width:100%;
+    margin-top:12px;
+    padding:13px;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(
+        135deg,
+        #2563eb,
+        #7c3aed
+    );
+    color:white;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.age-btn:hover{
+    filter:brightness(1.15);
+}
+
+.age-result{
+    margin-top:15px;
+    padding:14px;
+    border-radius:15px;
+    background:#0f172a;
+    color:#cbd5e1;
+    line-height:1.8;
+    font-size:14px;
+}
+
+.age-main{
+    color:#38bdf8;
+    font-size:20px;
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+.age-card{
+    padding:8px 0;
+    border-bottom:1px solid #ffffff0d;
+}
+
+</style>
+
+
+<script>
+
+function calculateAge(){
+
+    const dobInput =
+        document.getElementById("dob").value;
+
+    const result =
+        document.getElementById("ageResult");
+
+    if(!dobInput){
+
+        result.innerHTML =
+            "⚠️ Please select your date of birth.";
+
+        return;
+    }
+
+
+    const dob =
+        new Date(dobInput + "T00:00:00");
+
+    const today =
+        new Date();
+
+    if(dob > today){
+
+        result.innerHTML =
+            "⚠️ Date of birth future mein nahi ho sakti.";
+
+        return;
+    }
+
+
+    /* Exact Age */
+
+    let years =
+        today.getFullYear() -
+        dob.getFullYear();
+
+    let months =
+        today.getMonth() -
+        dob.getMonth();
+
+    let days =
+        today.getDate() -
+        dob.getDate();
+
+
+    if(days < 0){
+
+        months--;
+
+        const previousMonth =
+            new Date(
+                today.getFullYear(),
+                today.getMonth(),
+                0
+            );
+
+        days +=
+            previousMonth.getDate();
+    }
+
+
+    if(months < 0){
+
+        years--;
+        months += 12;
+    }
+
+
+    /* Total Days */
+
+    const difference =
+        today.getTime() -
+        dob.getTime();
+
+    const totalDays =
+        Math.floor(
+            difference /
+            (1000 * 60 * 60 * 24)
+        );
+
+
+    /* Next Birthday */
+
+    let nextBirthday =
+        new Date(
+            today.getFullYear(),
+            dob.getMonth(),
+            dob.getDate()
+        );
+
+
+    if(nextBirthday < today){
+
+        nextBirthday =
+            new Date(
+                today.getFullYear() + 1,
+                dob.getMonth(),
+                dob.getDate()
+            );
+    }
+
+
+    const daysUntilBirthday =
+        Math.ceil(
+            (
+                nextBirthday.getTime() -
+                today.getTime()
+            )
+            /
+            (1000 * 60 * 60 * 24)
+        );
+
+
+    /* Birthday Date */
+
+    const birthdayText =
+        nextBirthday.toLocaleDateString(
+            "en-IN",
+            {
+                day:"numeric",
+                month:"long",
+                year:"numeric"
+            }
+        );
+
+
+    /* Result */
+
+    result.innerHTML = `
+
+        <div class="age-main">
+            🎉 ${years} Years,
+            ${months} Months,
+            ${days} Days
+        </div>
+
+        <div class="age-card">
+            📅 Date of Birth:
+            ${dob.toLocaleDateString("en-IN")}
+        </div>
+
+        <div class="age-card">
+            📆 Total Days:
+            ${totalDays.toLocaleString("en-IN")}
+        </div>
+
+        <div class="age-card">
+            🎂 Next Birthday:
+            ${birthdayText}
+        </div>
+
+        <div class="age-card">
+            ⏳ Birthday Countdown:
+            ${daysUntilBirthday} days
+        </div>
+
+    `;
+
+}
+
+</script>
+</div>
+
+</div>
+</div>
+
+</div>
+
+
+<!-- HISTORY -->
+
+<div class="history">
+
+<div class="histhead">
+<span>🕘 HISTORY</span>
+<button onclick="clearHistory()">CLEAR</button>
+</div>
+
+<div class="histlist" id="history">
+<div style="text-align:center;color:#475569;padding:8px">
+No calculations yet
+</div>
+</div>
+
+</div>
+
+<div class="footer">
+Vivek Calculator X • Offline • Made for JEE
+</div>
+
+</div>
+
+
+<script>
+
+let current="";
+let memory=0;
+let angle="DEG";
+
+const answer=document.getElementById("answer");
+const expr=document.getElementById("expr");
+const history=document.getElementById("history");
+
+
+/* PANEL */
+
+function showPanel(name,btn){
+
+document.querySelectorAll(".panel")
+.forEach(x=>x.classList.remove("active"));
+
+document.getElementById(name)
+.classList.add("active");
+
+document.querySelectorAll(".modebar button")
+.forEach(x=>x.classList.remove("active"));
+
+btn.classList.add("active");
+
+}
+
+
+/* INSERT */
+
+function insert(v){
+current+=v;
+update();
+}
+
+function update(){
+answer.innerText=
+current
+.replaceAll("Math.PI","π")
+.replaceAll("Math.E","e")
+.replaceAll("**","^")
+.replaceAll("*","×")
+.replaceAll("/","÷")||"0";
+}
+
+
+/* CLEAR */
+
+function clearAll(){
+current="";
+expr.innerText="";
+answer.innerText="0";
+}
+
+function backspace(){
+current=current.slice(0,-1);
+update();
+}
+
+
+/* CALCULATE */
+
+function calculate(){
+
+try{
+
+if(!current)return;
+
+let old=current;
+
+let result=eval(current);
+
+if(!Number.isFinite(result))
+throw Error();
+
+result=Number(result.toFixed(10));
+
+expr.innerText=
+old
+.replaceAll("Math.PI","π")
+.replaceAll("Math.E","e")
+.replaceAll("**","^")
++" =";
+
+current=String(result);
+
+answer.innerText=
+result.toLocaleString("en-US",{
+maximumFractionDigits:10
+});
+
+saveHistory(old,result);
+
+}catch{
+
+answer.innerText="Error";
+current="";
+
+}
+
+}
+
+
+/* SCIENTIFIC */
+
+function toRad(x){
+return angle==="DEG"?x*Math.PI/180:x;
+}
+
+function fromRad(x){
+return angle==="DEG"?x*180/Math.PI:x;
+}
+
+function func(type){
+
+try{
+
+let x=eval(current);
+let r;
+
+switch(type){
+
+case"sin":r=Math.sin(toRad(x));break;
+case"cos":r=Math.cos(toRad(x));break;
+case"tan":r=Math.tan(toRad(x));break;
+
+case"asin":r=fromRad(Math.asin(x));break;
+case"acos":r=fromRad(Math.acos(x));break;
+case"atan":r=fromRad(Math.atan(x));break;
+
+case"sqrt":r=Math.sqrt(x);break;
+case"square":r=x*x;break;
+case"cube":r=x*x*x;break;
+case"log":r=Math.log10(x);break;
+case"ln":r=Math.log(x);break;
+case"exp":r=Math.exp(x);break;
+case"ten":r=Math.pow(10,x);break;
+case"inverse":r=1/x;break;
+case"abs":r=Math.abs(x);break;
+
+case"fact":
+
+if(x<0||!Number.isInteger(x))
+throw Error();
+
+r=1;
+
+for(let i=2;i<=x;i++)
+r*=i;
+
+break;
+
+}
+
+if(!Number.isFinite(r))
+throw Error();
+
+r=Number(r.toFixed(10));
+
+expr.innerText=
+type.toUpperCase()+"("+x+") =";
+
+current=String(r);
+update();
+
+saveHistory(type+"("+x+")",r);
+
+}catch{
+
+answer.innerText="Error";
+current="";
+
+}
+
+}
+
+
+/* PERCENT */
+
+function percent(){
+
+try{
+current=String(eval(current)/100);
+update();
+}catch{
+answer.innerText="Error";
+current="";
+}
+
+}
+
+
+/* ANGLE */
+
+function toggleAngle(){
+
+angle=angle==="DEG"?"RAD":"DEG";
+
+document.getElementById("angleMode")
+.innerText=angle;
+
+}
+
+
+/* MEMORY */
+
+function memoryClear(){
+memory=0;
+}
+
+function memoryRecall(){
+current+=String(memory);
+update();
+}
+
+function memoryAdd(){
+try{memory+=eval(current)}catch{}
+}
+
+function memoryStore(){
+try{memory=eval(current)}catch{}
+}
+
+
+/* HISTORY */
+
+function saveHistory(q,r){
+
+let data=
+JSON.parse(localStorage.getItem("vivekHistory")||"[]");
+
+data.unshift({
+q:q,
+r:r
+});
+
+data=data.slice(0,30);
+
+localStorage.setItem(
+"vivekHistory",
+JSON.stringify(data)
+);
+
+loadHistory();
+
+}
+
+function loadHistory(){
+
+let data=
+JSON.parse(localStorage.getItem("vivekHistory")||"[]");
+
+if(!data.length){
+
+history.innerHTML=
+'<div style="text-align:center;color:#475569;padding:8px">No calculations yet</div>';
+
+return;
+}
+
+history.innerHTML="";
+
+data.forEach(item=>{
+
+let div=document.createElement("div");
+
+div.className="histitem";
+
+div.innerText=
+item.q+" = "+item.r;
+
+div.onclick=()=>{
+current=String(item.r);
+update();
+};
+
+history.appendChild(div);
+
+});
+
+}
+
+function clearHistory(){
+
+localStorage.removeItem("vivekHistory");
+
+loadHistory();
+
+}
+
+
+/* STATISTICS */
+
+function statistics(){
+
+let raw=
+document.getElementById("numbers").value;
+
+let nums=
+raw.split(",")
+.map(Number)
+.filter(x=>Number.isFinite(x));
+
+if(!nums.length){
+
+document.getElementById("statsResult")
+.innerText="Please enter valid numbers.";
+
+return;
+
+}
+
+let sum=
+nums.reduce((a,b)=>a+b,0);
+
+let mean=sum/nums.length;
+
+let sorted=[...nums].sort((a,b)=>a-b);
+
+let median=
+sorted.length%2
+?sorted[Math.floor(sorted.length/2)]
+:(sorted[sorted.length/2-1]+
+sorted[sorted.length/2])/2;
+
+let variance=
+nums.reduce((a,b)=>a+(b-mean)**2,0)
+/nums.length;
+
+let sd=Math.sqrt(variance);
+
+document.getElementById("statsResult")
+.innerHTML=
+"Count: "+nums.length+
+"<br>Sum: "+sum+
+"<br>Mean: "+mean+
+"<br>Median: "+median+
+"<br>Standard Deviation: "+sd.toFixed(5);
+
+}
+
+
+/* UNIT CONVERTER */
+
+const units={
+
+length:{
+Meter:1,
+Kilometer:1000,
+Centimeter:.01,
+Millimeter:.001,
+Mile:1609.344,
+Foot:.3048
+},
+
+mass:{
+Kilogram:1,
+Gram:.001,
+Milligram:.000001,
+Pound:.45359237
+},
+
+speed:{
+"m/s":1,
+"km/h":.2777777778,
+"mph":.44704
+},
+
+temperature:{
+Celsius:"C",
+Fahrenheit:"F",
+Kelvin:"K"
+}
+
+};
+
+
+function updateUnits(){
+
+let type=
+document.getElementById("unitType").value;
+
+let from=
+document.getElementById("from");
+
+let to=
+document.getElementById("to");
+
+from.innerHTML="";
+to.innerHTML="";
+
+Object.keys(units[type])
+.forEach(u=>{
+
+from.innerHTML+=
+`<option>${u}</option>`;
+
+to.innerHTML+=
+`<option>${u}</option>`;
+
+});
+
+}
+
+function convert(){
+
+let type=
+document.getElementById("unitType").value;
+
+let value=
+Number(document.getElementById("unitValue").value);
+
+let from=
+document.getElementById("from").value;
+
+let to=
+document.getElementById("to").value;
+
+let result;
+
+if(type==="temperature"){
+
+if(from==="Celsius")
+value=value;
+else if(from==="Fahrenheit")
+value=(value-32)*5/9;
+else
+value=value-273.15;
+
+if(to==="Celsius")
+result=value;
+else if(to==="Fahrenheit")
+result=value*9/5+32;
+else
+result=value+273.15;
+
+}else{
+
+let base=value*units[type][from];
+
+result=base/units[type][to];
+
+}
+
+document.getElementById("convertResult")
+.innerText=
+"Result: "+result.toFixed(8);
+
+}
+
+
+/* COPY */
+
+function copyText(text){
+
+navigator.clipboard.writeText(text);
+
+}
+
+function toggleTheme(){
+
+document.body.style.background=
+document.body.style.background===""
+?"#e2e8f0":"#020617";
+
+}
+
+
+/* KEYBOARD */
+
+document.addEventListener("keydown",e=>{
+
+if(
+(e.key>="0"&&e.key<="9")||
+["+","-","*","/","(",")","."].includes(e.key)
+){
+insert(e.key);
+}
+
+if(e.key==="Enter")
+calculate();
+
+if(e.key==="Backspace")
+backspace();
+
+if(e.key==="Escape")
+clearAll();
+
+});
+
+
+/* START */
+
+updateUnits();
+loadHistory();
+
+</script>
+
+</body>
+</html>
